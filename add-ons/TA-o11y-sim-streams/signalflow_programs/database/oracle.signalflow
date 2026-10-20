@@ -1,0 +1,30 @@
+# SIM stream: Oracle database (oracledb.* from O11y Cloud -> sim_metrics)
+# Dimensions promoted for host/instance identity.
+# Cumulative counters use rollup='rate' so sim_metrics receives per-second values;
+# sessions.usage is summed across session_status/session_type.
+# input: Oracle_DB
+data('oracledb.cpu_time', rollup='rate').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.dml_locks.limit').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.dml_locks.usage').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.enqueue_deadlocks', rollup='rate').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.enqueue_locks.limit').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.enqueue_locks.usage').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.enqueue_resources.limit').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.enqueue_resources.usage').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.exchange_deadlocks', rollup='rate').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.executions', rollup='rate').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.hard_parses', rollup='rate').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.logical_reads', rollup='rate').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.parse_calls', rollup='rate').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.pga_memory').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.physical_reads', rollup='rate').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.processes.limit').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.processes.usage').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.sessions.limit').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.sessions.usage').sum(by=['host.name','oracledb.instance.name']).publish();
+data('oracledb.tablespace_size.limit').promote('host.name','oracledb.instance.name','tablespace_name',allow_missing=True).publish();
+data('oracledb.tablespace_size.usage').promote('host.name','oracledb.instance.name','tablespace_name',allow_missing=True).publish();
+data('oracledb.transactions.limit').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.transactions.usage').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.user_commits', rollup='rate').promote('host.name','oracledb.instance.name',allow_missing=True).publish();
+data('oracledb.user_rollbacks', rollup='rate').promote('host.name','oracledb.instance.name',allow_missing=True).publish()

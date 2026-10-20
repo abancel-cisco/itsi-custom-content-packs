@@ -1,0 +1,23 @@
+# SIM stream: OS Hosts (host.name identity; os.type dimension) -> sim_metrics
+# Source: Smart Agent/collectd host metrics. Feeds DA-ITSI-CP-sim-os-hosts.
+# input: OS_Hosts
+data('cpu.utilization', filter=(not filter('agent', '*'))).promote('host','host_kernel_name','host_linux_version','host_mem_total','host_cpu_cores', allow_missing=True).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('memory.free', filter=(not filter('agent', '*'))).sum(by=['host']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('disk_ops.read', rollup='rate').sum(by=['host.name']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('disk_ops.write', rollup='rate').sum(by=['host.name']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('memory.available', filter=(not filter('agent', '*'))).sum(by=['host']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('memory.used', filter=(not filter('agent', '*'))).sum(by=['host']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('memory.buffered', filter=(not filter('agent', '*'))).sum(by=['host']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('memory.cached', filter=(not filter('agent', '*'))).sum(by=['host']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('memory.active', filter=(not filter('agent', '*'))).sum(by=['host']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('memory.inactive', filter=(not filter('agent', '*'))).sum(by=['host']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('memory.wired', filter=(not filter('agent', '*'))).sum(by=['host']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('df_complex.used', filter=(not filter('agent', '*'))).sum(by=['host']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('df_complex.free', filter=(not filter('agent', '*'))).sum(by=['host']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('memory.utilization', filter=(not filter('agent', '*'))).promote('host',allow_missing=True).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('vmpage_io.swap.in', filter=(not filter('agent', '*')), rollup='rate').promote('host',allow_missing=True).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('vmpage_io.swap.out', filter=(not filter('agent', '*')), rollup='rate').promote('host',allow_missing=True).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('if_octets.tx', rollup='rate').scale(8).mean(by=['host.name']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('if_octets.rx', rollup='rate').scale(8).mean(by=['host.name']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('if_errors.rx', rollup='delta').sum(by=['host.name']).publish('DSIM:Hosts (Smart Agent/collectd)');
+data('if_errors.tx', rollup='delta').sum(by=['host.name']).publish('DSIM:Hosts (Smart Agent/collectd)');

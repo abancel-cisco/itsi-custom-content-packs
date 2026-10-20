@@ -1,0 +1,13 @@
+# SIM stream: PostgreSQL database (postgresql.* from O11y Cloud -> sim_metrics)
+# Dimensions promoted for host/database identity.
+# Metric names follow the OTel collector postgresqlreceiver (postgresql.db_size, postgresql.replication.data_delay).
+# Cumulative counters use rollup='rate' so sim_metrics receives per-second values.
+# input: Postgres_DB
+data('postgresql.backends').promote('host.name','postgresql.database.name',allow_missing=True).publish();
+data('postgresql.commits', rollup='rate').promote('host.name','postgresql.database.name',allow_missing=True).publish();
+data('postgresql.rollbacks', rollup='rate').promote('host.name','postgresql.database.name',allow_missing=True).publish();
+data('postgresql.deadlocks', rollup='rate').promote('host.name','postgresql.database.name',allow_missing=True).publish();
+data('postgresql.blocks_read', rollup='rate').promote('host.name','postgresql.database.name',allow_missing=True).publish();
+data('postgresql.db_size').promote('host.name','postgresql.database.name',allow_missing=True).publish();
+data('postgresql.connection.max').promote('host.name',allow_missing=True).publish();
+data('postgresql.replication.data_delay').promote('host.name','postgresql.database.name',allow_missing=True).publish()

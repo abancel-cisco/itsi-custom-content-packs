@@ -1,0 +1,21 @@
+# SIM stream: MSSQL / SQL Server database (sqlserver.* from O11y Cloud -> sim_metrics)
+# Dimensions promoted for host/database identity.
+# input: MSSQL_DB
+data('sqlserver.page.buffer_cache.hit_ratio').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.page.life_expectancy').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.user.connection.count').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.batch.request.rate').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.batch.sql_compilation.rate').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.batch.sql_recompilation.rate').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.lock.wait.rate').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.lock.wait_time.avg').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.processes.blocked').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.transaction.rate').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.transaction.write.rate').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.database.count').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.database.io').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.database.latency').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.database.operations').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.page.checkpoint.flush.rate').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.page.operation.rate').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish();
+data('sqlserver.page.split.rate').promote('host.name','sqlserver.instance.name','sqlserver.database.name',allow_missing=True).publish()
