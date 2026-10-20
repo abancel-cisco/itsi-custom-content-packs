@@ -53,6 +53,15 @@ Rates are per second. Oracle and PostgreSQL counters arrive as per-second rates 
 - KPIs ship without severity thresholds, so every KPI reports normal. Add static or adaptive thresholds per environment.
 - Postgres Replication Delay reports only on replicas. Elsewhere it shows N/A at info severity, which does not affect the health score.
 - Edit KPIs on the service templates, not on the services: linked services receive template changes.
+- Health scores can read 50 for up to 45 minutes after install while the health window still covers the period before entities existed. They recover on their own.
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| The pack does not appear in the content library after the app install | Restart Splunk, or call `POST /servicesNS/nobody/SA-ITOA/itoa_interface/content_pack/refresh` |
+| No metrics in `sim_metrics` | If the add-on's default SIM account points at another Observability org, set `org_id` on the three inputs. A same-name `sim_modular_input` stanza in another app's `local/` folder overrides this add-on's inputs, so remove it |
+| Import searches succeed but create no entities after a reinstall | ITSI's import change cache still holds the old rows. Delete the three searches' records from the KV collections `itsi_import_objects_cache` and `itsi_bulk_import_entities_status_cache`, then run the searches again |
 
 ## Authoring tool
 
