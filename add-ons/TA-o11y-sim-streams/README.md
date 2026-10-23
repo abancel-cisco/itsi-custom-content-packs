@@ -9,8 +9,9 @@ any ITSI content pack.
 
 - **Not ITSI-specific.** The metrics land in `sim_metrics` and are usable from Splunk core
   (search, dashboards, alerts) as much as from ITSI.
-- **Domain-agnostic.** OS hosts and databases (Oracle, PostgreSQL, MSSQL) are included today;
-  more domains (cloud, k8s…) drop in as new `signalflow_programs/<domain>/*.signalflow` files.
+- **Domain-agnostic.** OS hosts, databases (Oracle, PostgreSQL, MSSQL) and AI workloads (GPUs,
+  model serving, vector databases, provider tokens) are included today; more domains
+  drop in as new `signalflow_programs/<domain>/*.signalflow` files.
 
 ## Requirements
 
@@ -35,10 +36,25 @@ Streams ship `disabled = 1`, so nothing runs until you enable it.
 | database | `Oracle_DB` | `oracledb.*` | 25 |
 | database | `Postgres_DB` | `postgresql.*` | 8 |
 | database | `MSSQL_DB` | `sqlserver.*` | 18 |
+| ai | `AI_Infrastructure` | `DCGM_FI_DEV_*` (NVIDIA DCGM exporter), `vllm:*`, `milvus_*` | 24 |
+| ai | `AI_Providers` | `AWS/Bedrock` CloudWatch metrics, Azure OpenAI metrics | 10 |
 
 The `OS_Hosts` stream is meant for a separate OS hosts content pack that is not published in this repository yet.
 
-Cumulative counters (for example `oracledb.executions`, `postgresql.commits`) are requested with `rollup='rate'`, so the index receives per-second values. The SQL Server `*.rate` metrics are raw perf counters despite their gauge type; the database monitoring content pack derives their rates in its base search.
+Cumulative counters (for example `oracledb.executions`, `postgresql.commits`, the vLLM `*_total` counters) are requested with `rollup='rate'`, so the index receives per-second values. The SQL Server `*.rate` metrics are raw perf counters despite their gauge type; the database monitoring content pack derives their rates in its base search.
+
+### AI streams
+
+Every AI stream publishes a unique label: `aiinf_*` for `AI_Infrastructure`, `aitok_*` for `AI_Providers`. The SIM add-on keeps the source metric name as `metric_name` and stores the label in the `sf_streamLabel` dimension. Two computations on the same metric (for example Milvus total and failed requests) therefore differ only by `sf_streamLabel`, and searches should filter on it:
+
+```spl
+| mstats latest(_value) where index=sim_metrics metric_name=* sf_streamLabel=aiinf_gpu_* by sf_streamLabel UUID span=5m
+```
+
+- Histograms (`milvus_proxy_sq_latency`) are read with `histogram(...).sum()` and `.count()`, so each 5-minute point is the interval total.
+- Bedrock reports each model both per inference profile and per account; the stream keeps the maximum per `ModelId` to avoid double counting.
+- Cloud integration metrics (Bedrock, Azure OpenAI) reach Observability Cloud several minutes late, so `AI_Providers` points trail the other streams.
+- No stream collects agent instrumentation metrics (`gen_ai.*`), evaluations or guardrail results. They are out of scope for this add-on.
 
 ## Verify (~5 min after enable)
 
@@ -67,7 +83,8 @@ TA-o11y-sim-streams/
 │   └── inputs.conf                     # GENERATED (disabled stanzas)
 ├── signalflow_programs/
 │   ├── os/os_hosts.signalflow
-│   └── database/{oracle,postgres,mssql}.signalflow
+│   ├── database/{oracle,postgres,mssql}.signalflow
+│   └── ai/{ai_infrastructure,ai_providers}.signalflow
 ├── scripts/build_inputs_conf.py
 └── README.md
 ```
@@ -77,3 +94,10 @@ TA-o11y-sim-streams/
 ITSI packs (e.g. `DA-ITSI-CP-database-monitoring`) consume the metrics this TA collects. The
 pack's KPI base searches read `index=sim_metrics` (via the pack-owned macro
 `dbm_sim_metrics_indexes`). Install this TA alongside the pack and enable the matching streams.
+
+| Content pack | Streams |
+|---|---|
+| Database Monitoring | `Oracle_DB`, `MSSQL_DB`, `Postgres_DB` |
+| AI Infrastructure Monitoring | `AI_Infrastructure`, `AI_Providers` |
+
+See [CHANGELOG.md](CHANGELOG.md) for release notes.

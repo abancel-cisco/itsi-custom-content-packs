@@ -87,7 +87,7 @@ def main() -> int:
         out.append("# org_id = <your O11y org id>  ; blank = SIM add-on default org")
         out.append(f'signal_flow_programs = "{program}"')
         out.append("disabled = 1")
-        metrics = program.count("data(")
+        metrics = program.count("data(") + program.count("histogram(")
         summary.append((domain, name, metrics, f.relative_to(root)))
 
     dest = root / "default" / "inputs.conf"

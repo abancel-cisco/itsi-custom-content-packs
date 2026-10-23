@@ -1,0 +1,29 @@
+# SIM stream: AI infrastructure (NVIDIA DCGM GPUs, vLLM model serving, Milvus vector database)
+# Every stream carries a unique label; the SIM add-on stores it as the sf_streamLabel dimension,
+# which the AI Infrastructure Monitoring base searches pivot into columns.
+# Cumulative counters use rollup='rate' (per-second values); histograms publish sum and count.
+# input: AI_Infrastructure
+data('DCGM_FI_DEV_GPU_UTIL').mean(by=['UUID','host.name','gpu','modelName','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_gpu_util');
+data('DCGM_FI_DEV_FB_USED').mean(by=['UUID','host.name','gpu','modelName','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_gpu_fb_used');
+data('DCGM_FI_DEV_FB_FREE').mean(by=['UUID','host.name','gpu','modelName','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_gpu_fb_free');
+data('DCGM_FI_DEV_POWER_USAGE').mean(by=['UUID','host.name','gpu','modelName','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_gpu_power');
+data('DCGM_FI_DEV_GPU_TEMP').max(by=['UUID','host.name','gpu','modelName','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_gpu_temp');
+data('DCGM_FI_DEV_MEMORY_TEMP').max(by=['UUID','host.name','gpu','modelName','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_gpu_mem_temp');
+data('DCGM_FI_PROF_PIPE_TENSOR_ACTIVE').mean(by=['UUID','host.name','gpu','modelName','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_gpu_tensor');
+data('DCGM_FI_DEV_XID_ERRORS').max(by=['UUID','host.name','gpu','modelName','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_gpu_xid');
+data('vllm:num_requests_running').sum(by=['service.instance.id','model_name','host.name','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_vllm_running');
+data('vllm:num_requests_waiting').sum(by=['service.instance.id','model_name','host.name','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_vllm_waiting');
+data('vllm:kv_cache_usage_perc').mean(by=['service.instance.id','model_name','host.name','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_vllm_kv');
+data('vllm:gpu_cache_usage_perc').mean(by=['service.instance.id','model_name','host.name','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_vllm_kv_legacy');
+data('vllm:prompt_tokens_total', rollup='rate').sum(by=['service.instance.id','model_name','host.name','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_vllm_prompt_tps');
+data('vllm:generation_tokens_total', rollup='rate').sum(by=['service.instance.id','model_name','host.name','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_vllm_gen_tps');
+data('vllm:num_preemptions_total', rollup='rate').sum(by=['service.instance.id','model_name','host.name','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_vllm_preempt');
+data('vllm:e2e_request_latency_seconds_sum', rollup='rate').sum(by=['service.instance.id','model_name','host.name','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_vllm_e2e_sum');
+data('vllm:e2e_request_latency_seconds_count', rollup='rate').sum(by=['service.instance.id','model_name','host.name','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_vllm_e2e_count');
+data('milvus_proxy_req_count', filter=filter('status','total'), rollup='rate').sum(by=['service.instance.id','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_milvus_req');
+data('milvus_proxy_req_count', filter=filter('status','fail'), rollup='rate').sum(by=['service.instance.id','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_milvus_fail');
+histogram('milvus_proxy_sq_latency').sum(by=['service.instance.id','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_milvus_sq_sum');
+histogram('milvus_proxy_sq_latency').count(by=['service.instance.id','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_milvus_sq_count');
+data('milvus_proxy_search_vectors_count', rollup='rate').sum(by=['service.instance.id','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_milvus_search_vps');
+data('milvus_querynode_entity_num').sum(by=['service.instance.id','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_milvus_entities');
+data('milvus_num_node').sum(by=['service.instance.id','k8s.cluster.name'], allow_missing=True).publish(label='aiinf_milvus_nodes')

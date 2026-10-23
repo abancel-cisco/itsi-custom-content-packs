@@ -1,0 +1,15 @@
+# SIM stream: AI infrastructure provider tokens (AWS Bedrock and Azure OpenAI cloud integrations)
+# Token and request counts use rollup='sum' so each 5-minute point is the interval total.
+# Bedrock reports per inference profile and per account; max() avoids counting the same calls twice.
+# Costs are not in the cloud metrics; the AI Tokens and Costs pack prices tokens with its lookup.
+# input: AI_Providers
+data('InputTokenCount', filter=filter('namespace','AWS/Bedrock') and filter('stat','sum'), rollup='sum').max(by=['ModelId']).publish(label='aitok_bedrock_tok_in');
+data('OutputTokenCount', filter=filter('namespace','AWS/Bedrock') and filter('stat','sum'), rollup='sum').max(by=['ModelId']).publish(label='aitok_bedrock_tok_out');
+data('Invocations', filter=filter('namespace','AWS/Bedrock') and filter('stat','sum'), rollup='sum').max(by=['ModelId']).publish(label='aitok_bedrock_req');
+data('InvocationThrottles', filter=filter('namespace','AWS/Bedrock') and filter('stat','sum'), rollup='sum').max(by=['ModelId']).publish(label='aitok_bedrock_throttled');
+data('InvocationLatency', filter=filter('namespace','AWS/Bedrock') and filter('stat','mean')).max(by=['ModelId']).publish(label='aitok_bedrock_latency');
+data('ProcessedPromptTokens', filter=filter('aggregation_type','total'), rollup='sum').sum(by=['azure_resource_id','modeldeploymentname'], allow_missing=True).publish(label='aitok_azure_tok_in');
+data('GeneratedTokens', filter=filter('aggregation_type','total'), rollup='sum').sum(by=['azure_resource_id','modeldeploymentname'], allow_missing=True).publish(label='aitok_azure_tok_out');
+data('AzureOpenAIRequests', filter=filter('aggregation_type','total'), rollup='sum').sum(by=['azure_resource_id','modeldeploymentname'], allow_missing=True).publish(label='aitok_azure_req');
+data('AzureOpenAIRequests', filter=filter('aggregation_type','total') and filter('statuscode','429'), rollup='sum').sum(by=['azure_resource_id','modeldeploymentname'], allow_missing=True).publish(label='aitok_azure_throttled');
+data('TimeToResponse', filter=filter('aggregation_type','average')).mean(by=['azure_resource_id','modeldeploymentname'], allow_missing=True).publish(label='aitok_azure_latency')
